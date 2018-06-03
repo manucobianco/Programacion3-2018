@@ -7,7 +7,8 @@ public class SuperMain {
 
 		Grafo SuperGrafo = new Grafo();
 
-		ArrayList<Nodo> tester = SuperGrafo.getMasBuscados(50, "viajes");
+		//ArrayList<Nodo> tester = SuperGrafo.getMasBuscados(50, "viajes");
+		ArrayList<Nodo> tester = SuperGrafo.dfs("terror");
 		
 		for (Nodo nodito : tester) {
 			System.out.println(nodito.getValor());

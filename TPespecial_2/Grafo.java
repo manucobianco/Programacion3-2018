@@ -24,7 +24,7 @@ public class Grafo {
 	private void reader(){ // privado para el informe
 	
 		
-		String csvFile = "dataset2.csv";
+		String csvFile = "dataset1.csv";
 		String line = "";
 		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))){			
 			br.readLine();//salta la primera linea
@@ -146,6 +146,31 @@ public class Grafo {
 	public ArrayList<Arista> arista(String i){		//retorna los adyacentes de un vertice
 		return buscaVerticeEnGrafo(i).getAristas();
 	}
+	
+	
+	private ArrayList<Nodo> dfsRecu(Nodo nodoActual,Hashtable<Nodo, EstadoDeVisita> estadoNodos){
+		ArrayList<Nodo> nodosRet = new ArrayList<Nodo>();
+		
+		if (estadoNodos.get(nodoActual) == null) {
+			nodosRet.add(nodoActual);
+			estadoNodos.put(nodoActual,EstadoDeVisita.VISITANDO);
+		}
+		
+		if (nodoActual.tieneAdyacentes()) {
+			for (Arista arista : nodoActual.getAristas()) {
+				if (estadoNodos.get(arista.getDestino()) == null) { // si no tiene estado 
+					nodosRet.addAll(dfsRecu(arista.getDestino(),estadoNodos));
+				}
+			}	
+		}
+
+		return nodosRet;
+    }
+ 
+    public ArrayList<Nodo> dfs(String nodo){
+    	Hashtable<Nodo, EstadoDeVisita> estadoNodos = new Hashtable<Nodo, EstadoDeVisita>();
+    	return dfsRecu(this.buscaVerticeEnGrafo(nodo), estadoNodos);
+    }
 	
 	////*****************////
 	
