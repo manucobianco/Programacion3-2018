@@ -7,29 +7,24 @@ public class SuperMain {
 
 		Grafo SuperGrafo = new Grafo();
 
-		//ArrayList<Nodo> tester = SuperGrafo.getMasBuscados(50, "viajes");
-		ArrayList<Nodo> tester = SuperGrafo.dfs("terror");
+					//-----Punto 1-----
+//		ArrayList<Nodo> tester = SuperGrafo.getMasBuscadosDe(50, "terror");
+//		
+//		for (Nodo nodito : tester) {
+//			System.out.println(nodito.getValor());
+//		}
 		
-		for (Nodo nodito : tester) {
-			System.out.println(nodito.getValor());
-		}
+					//-----Punto 2-----
+//		ArrayList<Nodo> tester = SuperGrafo.nodosUnidosA("terror");
+//		for (Nodo nodito : tester) {
+//			System.out.println(nodito.getValor());
+//		}
 		
-//		SuperGrafo.add("a");
-//		SuperGrafo.add("b");
-//		SuperGrafo.add("c");
-//		SuperGrafo.add("d");
-//		SuperGrafo.add("e");
-//		SuperGrafo.add("f");
-//		SuperGrafo.add("g");
-//
-//		SuperGrafo.addArista("a","b");
-//		SuperGrafo.addArista("b","c");
-//		SuperGrafo.addArista("c","a");
-
-		
-//		System.out.println("Hay ciclo Iterable: "+SuperGrafo.esCiclico_Iterable());//funciona bien
-		
-//		System.out.println("Hay ciclo Recursivo: "+SuperGrafo.esCiclico_Recursivo());//con grandes valores genera errores de tipo Stackoverflow
+					//-----Punto 3-----
+//		ArrayList<Nodo> tester = SuperGrafo.generosAfines("terror");
+//		for (Nodo nodito : tester) {
+//			System.out.println(nodito.getValor());
+//		}
 		
 	}
 

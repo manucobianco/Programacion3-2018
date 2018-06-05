@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.attribute.FileOwnerAttributeView;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Stack;
@@ -22,9 +23,8 @@ public class Grafo {
 		}
 	}
 	private void reader(){ // privado para el informe
-	
 		
-		String csvFile = "dataset1.csv";
+		String csvFile = "dataset4.csv";
 		String line = "";
 		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))){			
 			br.readLine();//salta la primera linea
@@ -68,30 +68,36 @@ public class Grafo {
 		return false;
 	}
 	
-	public ArrayList<Nodo> getMasBuscados(int cant, String genero){ // retorna la N cantidad de generos mas buscados luego del genero q le pasan como parametro
+	//Obtener los N géneros más buscados luego de buscar por el género A.
+	public ArrayList<Nodo> getMasBuscadosDe(int cant, String genero) {  //Devuelve los mas buscados entre los adyacentes del nodo parametro
 		ArrayList<Nodo> ret = new ArrayList<Nodo>();
-		if (existeNodo(genero)) {
-			ret = buscarMientrasAdyacentes(cant,buscaVerticeEnGrafo(genero));
-		}else{
-			System.out.println("No existe el genero.");
-		}
-		return ret;
+		Nodo n = buscaVerticeEnGrafo(genero);
+		if (n != null) {
+			ArrayList<Arista> aristasAux = n.getAristas();
+			int i = 0;
+			int size = aristasAux.size();
+		  
+			while (i < size && i < cant) {
+				ret.add(getMayorNodo(aristasAux));
+				i++;
+			}
+		}	  
+	  return ret;
 	}
-	
-	private ArrayList<Nodo> buscarMientrasAdyacentes(int cant,Nodo n){ // buscar el adyacente mas grande, y se llama recursivamente con el nodo ese
-		ArrayList<Nodo> ret = new ArrayList<Nodo>();
-			
- 		if (n.tieneAdyacentes()&&cantRecorridos < cant) {
- 			Nodo aux2 = n.getNodoAdyacenteMayor();
- 			if (tablaVisita.get(aux2) == EstadoDeVisita.NO_VISITADO) {
- 				cantRecorridos++;
- 				tablaVisita.put(aux2, EstadoDeVisita.VISITADO);
- 				ret = buscarMientrasAdyacentes(cant,aux2);
+	 
+	private Nodo getMayorNodo(ArrayList<Arista> a) {
+		Nodo n = new Nodo();
+		int mayorValor = 0;
+		int index = 0;
+	  
+		for (Arista arista : a) {
+			if (arista.getPeso() > mayorValor) {
+				mayorValor = arista.getPeso();
+				index = a.indexOf(arista);
 			}
 		}
- 		ret.add(n);
- 		
- 		return ret; 
+		n = a.remove(index).getDestino();  
+		return n;
 	}
 	
 	public void add(String valor){//agrega un vertice al grafo
@@ -143,11 +149,11 @@ public class Grafo {
 		buscaVerticeEnGrafo(i).addArista(aux);
 	}
 	
-	public ArrayList<Arista> arista(String i){		//retorna los adyacentes de un vertice
+	private ArrayList<Arista> arista(String i){		//retorna los adyacentes de un vertice
 		return buscaVerticeEnGrafo(i).getAristas();
 	}
 	
-	
+	//Obtener todos los géneros que fueron buscados luego de buscar por el género A.
 	private ArrayList<Nodo> dfsRecu(Nodo nodoActual,Hashtable<Nodo, EstadoDeVisita> estadoNodos){
 		ArrayList<Nodo> nodosRet = new ArrayList<Nodo>();
 		
@@ -167,86 +173,58 @@ public class Grafo {
 		return nodosRet;
     }
  
-    public ArrayList<Nodo> dfs(String nodo){
-    	Hashtable<Nodo, EstadoDeVisita> estadoNodos = new Hashtable<Nodo, EstadoDeVisita>();
-    	return dfsRecu(this.buscaVerticeEnGrafo(nodo), estadoNodos);
+    public ArrayList<Nodo> nodosUnidosA(String nodo){
+    	if(existeNodo(nodo)){
+        	Hashtable<Nodo, EstadoDeVisita> estadoNodos = new Hashtable<Nodo, EstadoDeVisita>();
+           	return dfsRecu(this.buscaVerticeEnGrafo(nodo), estadoNodos);
+    	}else{
+    		return new ArrayList<Nodo>();
+    	}
     }
 	
-	////*****************////
-	
-
-	
-	public boolean esCiclico_Recursivo(){	//busca y devuelve si el grafo es ciclico o no, trabaja de manera recursiva
-		Hashtable<String, EstadoDeVisita> nodos = new Hashtable<String, EstadoDeVisita>();
-			for (int i=0; i<vertices.size(); i++){
-				nodos.put(vertices.get(i).getValor(), EstadoDeVisita.NO_VISITADO);//crea la tabla con los valores por defecto en NO_VISITADO
-			}
-			
-			for (int i=0; i<vertices.size(); i++){	//recorre los valores, si el vertice en el que estoy parado no esta visitado, lo visita con el dfs_visit, y retorna true, significa que hay ciclo ya que vuele a un nodo que esta visitando                         
-				if ((nodos.get(vertices.get(i).getValor()) == EstadoDeVisita.NO_VISITADO)){
-					if (dfs_visit(vertices.get(i), nodos)){  
-						return true;
-					}
-				}
-			}
-		return false;
-	}
-	
-	public boolean dfs_visit(Nodo nodo, Hashtable<String, EstadoDeVisita> nodos){ 		//visita los nodos
-		
-		if (nodos.get(nodo.getValor()) == EstadoDeVisita.VISITANDO){
-			return true;
-		}
-			
-		nodos.put(nodo.getValor(), EstadoDeVisita.VISITANDO);
-		
-		for (Arista aristas : nodo.getAristas()){
-			if( dfs_visit(aristas.getDestino(), nodos)){
-				return true;
-			}
-		}
-		
-		nodos.put(nodo.getValor(), EstadoDeVisita.VISITADO);
-		return false;
-	}
-	
-	public boolean esCiclico_Iterable(){	//recorre el grafo de forma iterable. Usa una pila resolver 
-		Hashtable<String, EstadoDeVisita> nodosVisita = new Hashtable<String, EstadoDeVisita>();
-		
-		Stack<Nodo> pila = new Stack<Nodo>();
-		
-		for (int i=0; i<vertices.size(); i++){
-			nodosVisita.put(vertices.get(i).getValor(), EstadoDeVisita.NO_VISITADO);
-		}
-		
-		pila.add(vertices.get(0));
-		
-		while (!pila.isEmpty()){//mientras la pila tenga vertices sigue funcionando
-			Nodo aux = pila.peek();
-			
-			if(nodosVisita.get(aux.getValor()) == EstadoDeVisita.NO_VISITADO){
-				nodosVisita.put(aux.getValor(), EstadoDeVisita.VISITANDO);
-				if (vertices.size() > 0){
-					for (int i = 0; i < aux.getAristas().size(); i++) {
-						if( (nodosVisita.get(aux.getAristaAt(i).getDestino().getValor()) == (EstadoDeVisita.NO_VISITADO))){
-							pila.add(aux.getAristaAt(i).getDestino());
-						}else if ((nodosVisita.get(aux.getAristaAt(i).getDestino().getValor()) == (EstadoDeVisita.VISITANDO))){
-							return true;
+	//Obtener el grafo únicamente con los géneros afines, es decir, que se vinculan entre sí (pasando o no por otros géneros).
+    private void  buscarAfines(Nodo nodo,Hashtable<Nodo, Boolean> afines,Hashtable<Nodo, EstadoDeVisita> estadoNodos, Nodo objetivo){
+    	if (nodo.tieneAdyacentes()) {
+        	for (Arista arista : nodo.getAristas()) {
+        		if (estadoNodos.get(arista.getDestino()) == EstadoDeVisita.NO_VISITADO) {
+        			if (!arista.getDestino().equals(objetivo)) {
+        				if (arista.getDestino().tieneAdyacentes()) {
+        		        	estadoNodos.put(arista.getDestino(), EstadoDeVisita.VISITADO);
+        					buscarAfines(arista.getDestino(),afines,estadoNodos,objetivo);
 						}
 					}
-				}else{
-					nodosVisita.put(aux.getValor(), EstadoDeVisita.VISITADO);
-					pila.pop();
+        			else{
+    					afines.put(arista.getDestino(), true);
+    				}
 				}
-				
-			}else if(nodosVisita.get(aux.getValor()) == EstadoDeVisita.VISITADO){
-				pila.pop();
-			}else{
-				nodosVisita.put(aux.getValor(), EstadoDeVisita.VISITADO);
-				pila.pop();
-			}
+        		if (afines.get(arista.getDestino())) {
+        			afines.put(nodo, true);
+				}
+    		}
 		}
-		return false;
-	}
-	
+    }
+    
+    public ArrayList<Nodo> generosAfines(String nodo){
+    	Nodo buscar = buscaVerticeEnGrafo(nodo);
+    	
+    	ArrayList<Nodo> arrRet = new ArrayList<Nodo>();
+    	if (buscar != null) {
+    		Hashtable<Nodo, EstadoDeVisita> estadoNodos = new Hashtable<Nodo, EstadoDeVisita>();
+        	Hashtable<Nodo,Boolean> afines = new Hashtable<Nodo,Boolean>();
+        	
+        	for (Nodo actual : vertices) {
+        		afines.put(actual, false);
+        		estadoNodos.put(actual, EstadoDeVisita.NO_VISITADO);
+    		}	
+        	
+        	buscarAfines(buscar,afines,estadoNodos,buscar);
+        	
+        	for (Nodo clave : afines.keySet()) {
+    			if (afines.get(clave)) {
+    				arrRet.add(clave);
+    			}
+    		}
+		}
+    	return arrRet;
+    }
 }
