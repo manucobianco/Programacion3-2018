@@ -1,30 +1,29 @@
-
 public class Arbol {
-	Node raiz;
+	private Node raiz;
 	
-	public class Node {
-		int value;
-		Node izq;
-		Node der;
-		
-		public Node(int val){
+	private class Node {
+    private	int value;
+    private	Node izq;
+    private	Node der;
+	
+		private Node(int val){
 			this.value = val;
 			this.izq = null;
 			this.der = null;
 		}
-		public int getVal(){
+		private int getVal(){
 			return  value;
 		}
-		public void setIzq(Node n){
+		private void setIzq(Node n){
 			this.izq = n;
 		}
-		public void setDer(Node n){
+		private void setDer(Node n){
 			this.der = n;
 		}
-		public Node getIzq(){
+		private Node getIzq(){
 			return this.izq;
 		}
-		public Node getDer(){
+		private Node getDer(){
 			return this.der;
 		}
 	}
